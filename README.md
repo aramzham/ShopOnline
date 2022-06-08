@@ -1,9 +1,8 @@
 # ShopOnline
-A simple online shop application made by using:
+A simple online shop application made by using[^1]:
 <ul>
   <li>Frontend: Blazor Web assembly</li>
   <li>Backend: Asp.Net core 6.0 Rest api</li>
-  <li><a href="https://www.youtube.com/watch?v=sHuuo9L3e5c">Tutorial</a></li>
 </ul>
 <br/>
 <p>:seedling: After running the application a local database will be created with seeded data. :fallen_leaf:</p>
@@ -19,3 +18,5 @@ The application has very basic functionalities like:
   <li>run js functions</li>
   <li>make payment using PayPal :credit_card:<i>(requires PayPal business account)</i></li>
 </ul>
+
+[^1]: <a href="https://www.youtube.com/watch?v=sHuuo9L3e5c">link</a> to the initial tutorial
