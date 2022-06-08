@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Api.Extensions;
 using ShopOnline.Api.Repositories.Contracts;
 using ShopOnline.Models.Dtos;
@@ -10,35 +9,31 @@ namespace ShopOnline.Api.Controllers
     [ApiController]
     public class ShoppingCartController : ControllerBase
     {
-        private readonly IShoppingCartRepository shoppingCartRepository;
-        private readonly IProductRepository productRepository;
+        private readonly IShoppingCartRepository _shoppingCartRepository;
+        private readonly IProductRepository _productRepository;
 
         public ShoppingCartController(IShoppingCartRepository shoppingCartRepository,
                                       IProductRepository productRepository)
         {
-            this.shoppingCartRepository = shoppingCartRepository;
-            this.productRepository = productRepository;
+            _shoppingCartRepository = shoppingCartRepository;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
-        [Route("{userId}/GetItems")]
+        [Route("{userId:int}/GetItems")]
         public async Task<ActionResult<IEnumerable<CartItemDto>>> GetItems(int userId)
         {
             try
             {
-                var cartItems = await this.shoppingCartRepository.GetItems(userId);
+                var cartItems = await _shoppingCartRepository.GetItems(userId);
 
-                if (cartItems == null)
-                {
+                if (cartItems is null)
                     return NoContent();
-                }
                 
-                var products = await this.productRepository.GetItems();
+                var products = await _productRepository.GetItems();
 
                 if (products == null)
-                {
                     throw new Exception("No products exist in the system");
-                }
 
                 var cartItemsDto = cartItems.ConvertToDto(products);
 
@@ -48,7 +43,6 @@ namespace ShopOnline.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-               
             }
         }
        
@@ -57,17 +51,14 @@ namespace ShopOnline.Api.Controllers
         {
             try
             {
-                var cartItem = await this.shoppingCartRepository.GetItem(id);
+                var cartItem = await _shoppingCartRepository.GetItem(id);
                 if (cartItem == null)
-                {
                     return NotFound();
-                }
-                var product = await productRepository.GetItem(cartItem.ProductId);
+                
+                var product = await _productRepository.GetItem(cartItem.ProductId);
 
                 if (product == null)
-                {
                     return NotFound();
-                }
                 var cartItemDto = cartItem.ConvertToDto(product);
                
                 return Ok(cartItemDto);
@@ -83,19 +74,15 @@ namespace ShopOnline.Api.Controllers
         {
             try
             {
-                var newCartItem = await this.shoppingCartRepository.AddItem(cartItemToAddDto);
+                var newCartItem = await _shoppingCartRepository.AddItem(cartItemToAddDto);
 
-                if (newCartItem == null)
-                {
+                if (newCartItem is null)
                     return NoContent();
-                }
 
-                var product = await productRepository.GetItem(newCartItem.ProductId);
+                var product = await _productRepository.GetItem(newCartItem.ProductId);
 
-                if (product == null)
-                {
+                if (product is null)
                     throw new Exception($"Something went wrong when attempting to retrieve product (productId:({cartItemToAddDto.ProductId})");
-                }
 
                 var newCartItemDto = newCartItem.ConvertToDto(product);
 
@@ -114,14 +101,12 @@ namespace ShopOnline.Api.Controllers
         {
             try
             {
-                var cartItem = await this.shoppingCartRepository.DeleteItem(id);
+                var cartItem = await _shoppingCartRepository.DeleteItem(id);
                 
                 if (cartItem == null)
-                { 
                     return NotFound();
-                }
 
-                var product = await this.productRepository.GetItem(cartItem.ProductId);
+                var product = await _productRepository.GetItem(cartItem.ProductId);
 
                 if (product == null)
                     return NotFound();
@@ -141,13 +126,11 @@ namespace ShopOnline.Api.Controllers
         {
             try
             {
-                var cartItem = await this.shoppingCartRepository.UpdateQty(id, cartItemQtyUpdateDto);
+                var cartItem = await _shoppingCartRepository.UpdateQty(id, cartItemQtyUpdateDto);
                 if (cartItem == null)
-                {
                     return NotFound();
-                }
 
-                var product = await productRepository.GetItem(cartItem.ProductId);
+                var product = await _productRepository.GetItem(cartItem.ProductId);
 
                 var cartItemDto = cartItem.ConvertToDto(product);
 
@@ -158,8 +141,6 @@ namespace ShopOnline.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
         }
-
     }
 }

@@ -7,49 +7,42 @@ namespace ShopOnline.Api.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly ShopOnlineDbContext shopOnlineDbContext;
+        private readonly ShopOnlineDbContext _shopOnlineDbContext;
 
         public ProductRepository(ShopOnlineDbContext shopOnlineDbContext)
         {
-            this.shopOnlineDbContext = shopOnlineDbContext;
+            _shopOnlineDbContext = shopOnlineDbContext;
         }
+
         public async Task<IEnumerable<ProductCategory>> GetCategories()
         {
-            var categories = await this.shopOnlineDbContext.ProductCategories.ToListAsync();
-           
-            return categories; 
-        
+            var categories = await _shopOnlineDbContext.ProductCategories.ToListAsync();
+
+            return categories;
         }
 
-        public async Task<ProductCategory> GetCategory(int id)
+        public Task<ProductCategory> GetCategory(int id)
         {
-            var category = await shopOnlineDbContext.ProductCategories.SingleOrDefaultAsync(c => c.Id == id);
-            return category;
+            return _shopOnlineDbContext.ProductCategories.FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<Product> GetItem(int id)
+        public Task<Product> GetItem(int id)
         {
-            var product = await shopOnlineDbContext.Products
-                                .Include(p => p.ProductCategory)
-                                .SingleOrDefaultAsync(p => p.Id == id);
-            return product;
+            return _shopOnlineDbContext.Products
+                .Include(p => p.ProductCategory)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<IEnumerable<Product>> GetItems()
         {
-            var products = await this.shopOnlineDbContext.Products
-                                     .Include(p => p.ProductCategory).ToListAsync();
-
-            return products;
-        
+            return await _shopOnlineDbContext.Products.Include(p => p.ProductCategory).ToListAsync();
         }
 
         public async Task<IEnumerable<Product>> GetItemsByCategory(int id)
         {
-            var products = await this.shopOnlineDbContext.Products
-                                     .Include(p => p.ProductCategory)
-                                     .Where(p => p.CategoryId == id).ToListAsync();
-            return products;
+            return await _shopOnlineDbContext.Products
+                .Include(p => p.ProductCategory)
+                .Where(p => p.CategoryId == id).ToListAsync();
         }
     }
 }
